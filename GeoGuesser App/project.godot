@@ -11,7 +11,10 @@ config_version=4
 [application]
 
 config/name="GeoGuesser"
-config/icon="res://icon.png"
+run/main_scene="res://Menu/Menu.tscn"
+boot_splash/image="res://Assets/game_logo.png"
+config/icon="res://Assets/Autisitic_shrek.png"
+config/windows_native_icon="res://Assets/Autistic_shrek.ico"
 
 [physics]
 
