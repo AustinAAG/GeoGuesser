@@ -11,7 +11,7 @@ func _ready():
 
 #TODO: Start the game in single player mode
 func _on_SinglePlayer_pressed():
-	pass # Replace with function body.
+	get_tree().change_scene("res://Game/GameScreen.tscn")
 
 
 #TODO: Start the game in multiplayer mode
