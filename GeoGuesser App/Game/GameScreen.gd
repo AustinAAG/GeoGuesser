@@ -1,17 +1,21 @@
 extends Panel
 
-onready var streetView = $StreetView
+onready var streetView = $MarginContainer/StreetView
 onready var button1 = $Options/Panel/HBoxContainer/Button
 onready var button2 = $Options/Panel/HBoxContainer/Button2
 onready var button3 = $Options/Panel/HBoxContainer/Button3
 onready var button4 = $Options/Panel/HBoxContainer/Button4
 onready var timer = $Countdown/Timer
+onready var streetViewContainer = $MarginContainer
 
 var data : PoolStringArray
-var original_url = "https://www.generatormix.com/random-image-generator"
+var original_url = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=40.170141,-76.994244&heading=151.78&pitch=-0.76&key="
 var img_url_passed
 var http_request
 var new_image_url
+var width
+var height
+var image
 
 func _ready():
 	# Create an HTTP request node and connect its completion signal.
@@ -21,14 +25,20 @@ func _ready():
 	
 	http_request(original_url)
 
+func _physics_process(delta):
+	print(streetViewContainer.get_size().x)
+	print(streetViewContainer.get_size().y)
+	if width != streetViewContainer.get_size().x || height != streetViewContainer.get_size().y:
+		width = streetViewContainer.get_size().x
+		height = streetViewContainer.get_size().y
+		if image != null:
+			image.resize(width, height, 1)
+			var texture = ImageTexture.new()
+			texture.create_from_image(image)
+			streetView.texture = texture
+
 
 func http_request(url):
-	if url == original_url:
-		img_url_passed = false
-	else:
-		img_url_passed = true
-	
-	print(url)
 	# Perform the HTTP request. The URL below returns a PNG and JPG image as of writing.
 	var error = http_request.request(url)
 	if error != OK:
@@ -36,35 +46,14 @@ func http_request(url):
 
 
 func _http_request_completed(result, response_code, headers, body):
-	if !img_url_passed:
-		var response = body.get_string_from_utf8()
-		data = response.split('<img class="lazy thumbnail" src="')
-		var image_url = str(data[1]).split('" data-src=')
-		new_image_url = image_url[1].split("\"")
-		print(new_image_url[1])
-		#http_request(str(image_url[1]))
-		http_request(str(new_image_url[1]))
-		#print(image_url[0])
-		#print("----------")
-		#print(image_url)
+	image = Image.new()
+	var error = image.load_jpg_from_buffer(body)
+	if error != OK:
+		push_error("Couldn't load the image.")
 	
-	var image = Image.new()
-	
-	if '.jpg' in new_image_url[1]:
-		var error = image.load_jpg_from_buffer(body)
-		if error != OK:
-			push_error("Couldn't load the image.")
-
-	if '.png' in new_image_url[1]:
-		var error = image.load_png_from_buffer(body)
-		if error != OK:
-			push_error("Couldn't load the image.")
-	
-	
-	image.resize(streetView.get_size().x, streetView.get_size().y, 1)
+	image.resize(width, height, 1)
 	var texture = ImageTexture.new()
 	texture.create_from_image(image)
-	
 	
 	#Display the image in a TextureRect node.
 	streetView.texture = texture
