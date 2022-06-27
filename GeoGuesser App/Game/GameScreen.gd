@@ -11,6 +11,7 @@ var data : PoolStringArray
 var original_url = "https://www.generatormix.com/random-image-generator"
 var img_url_passed
 var http_request
+var new_image_url
 
 func _ready():
 	# Create an HTTP request node and connect its completion signal.
@@ -28,7 +29,7 @@ func http_request(url):
 		img_url_passed = true
 	
 	print(url)
-	# Perform the HTTP request. The URL below returns a PNG image as of writing.
+	# Perform the HTTP request. The URL below returns a PNG and JPG image as of writing.
 	var error = http_request.request(url)
 	if error != OK:
 		push_error("an error occured in the HTTP request.") 
@@ -39,15 +40,31 @@ func _http_request_completed(result, response_code, headers, body):
 		var response = body.get_string_from_utf8()
 		data = response.split('<img class="lazy thumbnail" src="')
 		var image_url = str(data[1]).split('" data-src=')
-		http_request(str(image_url[0]))
+		new_image_url = image_url[1].split("\"")
+		print(new_image_url[1])
+		#http_request(str(image_url[1]))
+		http_request(str(new_image_url[1]))
+		#print(image_url[0])
+		#print("----------")
+		#print(image_url)
 	
 	var image = Image.new()
-	var error = image.load_png_from_buffer(body)
-	if error != OK:
-		push_error("Couldn't load the image.")
 	
+	if '.jpg' in new_image_url[1]:
+		var error = image.load_jpg_from_buffer(body)
+		if error != OK:
+			push_error("Couldn't load the image.")
+
+	if '.png' in new_image_url[1]:
+		var error = image.load_png_from_buffer(body)
+		if error != OK:
+			push_error("Couldn't load the image.")
+	
+	
+	image.resize(streetView.get_size().x, streetView.get_size().y, 1)
 	var texture = ImageTexture.new()
 	texture.create_from_image(image)
+	
 	
 	#Display the image in a TextureRect node.
 	streetView.texture = texture
