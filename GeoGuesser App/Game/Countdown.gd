@@ -20,6 +20,7 @@ func _physics_process(delta):
 	if seconds == -1:
 		emit_signal("timer_ended")
 		seconds = time
+		timer.stop()
 	
 	if seconds >= 10:
 		sec.set_text(str(seconds))

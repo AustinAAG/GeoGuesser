@@ -94,7 +94,6 @@ fit_content_height = true
 [node name="Timer" type="Timer" parent="Countdown"]
 process_mode = 0
 wait_time = 0.1
-autostart = true
 script = ExtResource( 3 )
 
 [connection signal="pressed" from="Options/Panel/HBoxContainer/Button" to="." method="_on_Button_pressed"]
