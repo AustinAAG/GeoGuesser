@@ -16,18 +16,21 @@ var new_image_url
 var width
 var height
 var image
+var rng = RandomNumberGenerator.new()
 
 func _ready():
 	# Create an HTTP request node and connect its completion signal.
+	rng.randomize()
 	http_request = HTTPRequest.new()
 	add_child(http_request)
 	http_request.connect("request_completed", self, "_http_request_completed")
-	
+	var new_url = "https://maps.googleapis.com/maps/api/streetview?size=600x300&location=" + str(rng.randf_range(0.000000, 1.0)*180 - 90) + "," + str(rng.randf_range(0.000000, 1.0)*360 - 180) + "&heading=151.78&pitch=-0.76&key=INSERT_API_KEY_HERE&return_error_code=true"
+	print(new_url)
 	http_request(original_url)
 
 func _physics_process(delta):
-	print(streetViewContainer.get_size().x)
-	print(streetViewContainer.get_size().y)
+#	print(streetViewContainer.get_size().x)
+#	print(streetViewContainer.get_size().y)
 	if width != streetViewContainer.get_size().x || height != streetViewContainer.get_size().y:
 		width = streetViewContainer.get_size().x
 		height = streetViewContainer.get_size().y
@@ -78,3 +81,4 @@ func _on_Button_pressed():
 
 func _on_Countdown_timer_ended():
 	http_request(original_url)
+
